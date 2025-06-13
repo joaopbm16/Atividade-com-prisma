@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Usuarios{
+  id Int @id @default(autoincrement())
+  nome_usua String
+  email_usua String @unique
+  senha_usua String
+  criacao_usua DateTime @default(now())
+
+  Postagens Postagens[]
+
+  @@map("Usuarios")
+}
+
+model Postagens{
+   id Int @id @default(autoincrement())
+   usuario_id Int
+   mensagem_post String
+   criacao_post DateTime @default(now())
+
+   usuario Usuarios @relation(fields: [usuario_id], references: [id])
+
+   @@map("Postagens")
+}
+
+model CurtidasEmPostagens{
+   id Int @id @default(autoincrement())
+   usuario_id Int
+   postagem_id String
+   criacao_cupo DateTime @default(now())
+
+   usuario Usuarios @relation(fields: [usuario_id], references: [id])
+   postagens Postagens @relation(fields: [postagem_id], references: [id])
+}
+
+
+
