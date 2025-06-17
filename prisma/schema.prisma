@@ -13,38 +13,71 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Usuarios{
-  id Int @id @default(autoincrement())
-  nome_usua String
-  email_usua String @unique
-  senha_usua String
+model Usuarios {
+  id           Int      @id @default(autoincrement())
+  nome_usua    String
+  email_usua   String   @unique
+  senha_usua   String
   criacao_usua DateTime @default(now())
 
-  Postagens Postagens[]
+  Postagens            Postagens[]
+  Curtidas             Curtidas[]
+  comentarios          Comentarios[]
+  Curtidas_Comentarios Curtidas_Comentarios[]
 
   @@map("Usuarios")
 }
 
-model Postagens{
-   id Int @id @default(autoincrement())
-   usuario_id Int
-   mensagem_post String
-   criacao_post DateTime @default(now())
+model Postagens {
+  id            Int      @id @default(autoincrement())
+  usuario_id    Int
+  mensagem_post String
+  criacao_post  DateTime @default(now())
 
-   usuario Usuarios @relation(fields: [usuario_id], references: [id])
+  usuario     Usuarios      @relation(fields: [usuario_id], references: [id])
+  Curtidas    Curtidas[]
+  comentarios Comentarios[]
 
-   @@map("Postagens")
+  @@map("Postagens")
 }
 
-model CurtidasEmPostagens{
-   id Int @id @default(autoincrement())
-   usuario_id Int
-   postagem_id String
-   criacao_cupo DateTime @default(now())
+model Curtidas {
+  id           Int      @id @default(autoincrement())
+  usuario_id   Int
+  postagem_id  Int
+  criacao_curt DateTime @default(now())
 
-   usuario Usuarios @relation(fields: [usuario_id], references: [id])
-   postagens Postagens @relation(fields: [postagem_id], references: [id])
+  usuario  Usuarios  @relation(fields: [usuario_id], references: [id])
+  postagem Postagens @relation(fields: [postagem_id], references: [id])
+
+  @@unique([usuario_id, postagem_id])
+  @@map("Curtidas")
 }
 
+model Comentarios {
+  id            Int      @id @default(autoincrement())
+  usuario_id    Int
+  postagem_id   Int
+  mensagem_come String
+  criacao_come  DateTime @default(now())
 
+  usuario              Usuarios               @relation(fields: [usuario_id], references: [id])
+  postagem             Postagens              @relation(fields: [postagem_id], references: [id])
+  Curtidas_Comentarios Curtidas_Comentarios[]
 
+  @@unique([usuario_id, postagem_id])
+  @@map("Comentarios")
+}
+
+model Curtidas_Comentarios {
+  id            Int      @id @default(autoincrement())
+  usuario_id    Int
+  comentario_id Int
+  criacao_cuco  DateTime @default(now())
+
+  usuario    Usuarios    @relation(fields: [usuario_id], references: [id])
+  comentario Comentarios @relation(fields: [usuario_id], references: [id])
+
+  @@unique([usuario_id, comentario_id])
+  @@map("Curtidas_Comentarios")
+}
